@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: yt-proxy-site
+    env: node
+    region: singapore
+    plan: free
+    buildCommand: "npm install"
+    startCommand: "npm start"
+    envVars:
+      NODE_VERSION: 18
