@@ -3,37 +3,37 @@
 <head>
   <meta charset="UTF-8">
   <title>YouTube ダウンローダー</title>
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 </head>
 <body>
   <h1>YouTube ダウンローダー</h1>
 
   <input id="url" placeholder="YouTube URL を入力" style="width:300px;">
-  <button onclick="create()">ダウンロードリンク生成</button>
+  <button onclick="start()">ダウンロードリンク生成</button>
 
   <div id="result"></div>
 
   <script>
-    async function create() {
+    const socket = io();
+
+    function start() {
       const url = document.getElementById("url").value;
+      socket.emit("download", { url });
+    }
 
-      const res = await fetch("/api/create", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url })
-      });
-
-      const data = await res.json();
-
-      if (data.error) {
-        document.getElementById("result").innerHTML = "エラー: " + data.error;
-        return;
-      }
-
+    socket.on("done", (data) => {
       document.getElementById("result").innerHTML = `
         <p>タイトル: ${data.title}</p>
         <a href="${data.downloadUrl}" download>動画をダウンロード</a>
       `;
-    }
+    });
+
+    socket.on("error", (err) => {
+      document.getElementById("result").innerHTML = `
+        <p style="color:red;">エラー: ${err.error}</p>
+        <pre>${err.raw || ""}</pre>
+      `;
+    });
   </script>
 </body>
 </html>
