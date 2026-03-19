@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>YouTube ダウンローダー</title>
+</head>
+<body>
+  <h1>YouTube ダウンローダー</h1>
+
+  <input id="url" placeholder="YouTube URL を入力" style="width:300px;">
+  <button onclick="create()">ダウンロードリンク生成</button>
+
+  <div id="result"></div>
+
+  <script>
+    async function create() {
+      const url = document.getElementById("url").value;
+
+      const res = await fetch("/api/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url })
+      });
+
+      const data = await res.json();
+
+      if (data.error) {
+        document.getElementById("result").innerHTML = "エラー: " + data.error;
+        return;
+      }
+
+      document.getElementById("result").innerHTML = `
+        <p>タイトル: ${data.title}</p>
+        <a href="${data.downloadUrl}" download>動画をダウンロード</a>
+      `;
+    }
+  </script>
+</body>
+</html>
